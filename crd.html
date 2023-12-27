@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Management System</title>
+  <style>
+    /* Add your custom CSS styling here */
+  </style>
+</head>
+<body>
+  <h1>Student Management System</h1>
+
+  <div id="inputForm">
+    <h2>Add New Student</h2>
+    <h4> id </h4>
+    <input type="text" id="studentId" placeholder="Student ID"></br>
+    <h4> name </h4>
+    <input type="text" id="studentName" placeholder="Name"></br>
+    <h4> Email </h4>
+    <input type="text" id="studentEmail" placeholder="Email"></br>
+    <h1> Age </h1>
+    <input type="text" id="studentAge" placeholder="Age"></br>
+    <button onclick="addStudent()">Submit</button>
+  </div>
+
+  <div id="studentsContainer">
+    <!-- Student data will be inserted here dynamically -->
+  </div>
+
+  <script>
+    // Fetch all students from the server
+    fetch('/students')
+      .then(response => response.json())
+      .then(students => {
+        const studentsContainer = document.getElementById('studentsContainer');
+
+        students.forEach(student => {
+          const studentDiv = document.createElement('div');
+          studentDiv.innerHTML = `
+            <h2>Student ID: ${student.id}</h2>
+            <p>Name: ${student.name}</p>
+            <p>Email: ${student.email}</p>
+            <p>Age: ${student.age}</p>
+            <p>Major: ${student.major}</p>
+          `;
+          studentsContainer.appendChild(studentDiv);
+        });
+      })
+      .catch(error => console.log('Error:', error));
+
+    // Add a new student
+    function addStudent() {
+      const studentId = document.getElementById('studentId').value;
+      const studentName = document.getElementById('studentName').value;
+      const studentEmail = document.getElementById('studentEmail').value;
+      const studentAge = document.getElementById('studentage').value;
+
+      const newStudent = {
+        id: studentId,
+        name: studentName,
+        email: studentEmail
+      };
+
+      fetch('/students', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newStudent)
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Clear the input fields
+          document.getElementById('studentId').value = '';
+          document.getElementById('studentName').value = '';
+          document.getElementById('studentEmail').value = '';
+          document.getElementById('studentage').value = '';
+
+          // Display the newly added student
+          const studentsContainer = document.getElementById('studentsContainer');
+          const studentDiv = document.createElement('div');
+          studentDiv.innerHTML = `
+            <h2>Student ID: ${data.student.id}</h2>
+            <p>Name: ${data.student.name}</p>
+            <p>Email: ${data.student.email}</p>
+            <p>Age: ${data.student.age}</p>
+          `;
+          studentsContainer.appendChild(studentDiv);
+        })
+        .catch(error => console.log('Error:', error));
+    }
+  </script>
+</body>
+</html>
+  
